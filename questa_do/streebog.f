@@ -6,5 +6,5 @@ src/p_permutation.sv
 src/l_transformation.sv
 src/lpsx.sv
 src/g_function.sv
-src/sum_m2.sv
+src/sc.sv
 

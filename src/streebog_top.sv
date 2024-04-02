@@ -69,9 +69,9 @@ logic                  nsum_out_valid;
 
 logic clear_sum;
 
-sum_m2 #(
+sc #(
     .DATA_WIDTH         (512)
-) u_sum_m2_n (
+) u_sc_n (
     .clk_i              (clk_i),
     .rstn_i             (rstn_i),
 	.clear_i            (clear_sum),
@@ -90,9 +90,9 @@ logic [DATA_WIDTH-1:0] msum_out;
 logic                  msum_out_valid;
 
 
-sum_m2 #(
+sc #(
     .DATA_WIDTH         (512)
-) u_sum_m2_m (
+) u_sc_m (
     .clk_i              (clk_i),
     .rstn_i             (rstn_i),
 	.clear_i            (clear_sum),

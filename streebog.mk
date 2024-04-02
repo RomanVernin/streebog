@@ -10,4 +10,4 @@ streebog_FILES  += $(streebog_PATH)/l_transformation.sv
 streebog_FILES  += $(streebog_PATH)/lpsx_precalc.sv
 streebog_FILES  += $(streebog_PATH)/lpsx.sv
 streebog_FILES  += $(streebog_PATH)/g_function.sv
-streebog_FILES  += $(streebog_PATH)/sum_m2.sv
+streebog_FILES  += $(streebog_PATH)/sc.sv
