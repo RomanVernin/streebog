@@ -150,15 +150,14 @@ if(!rstn_i)
    k_b        <= '0; 
    h_b_in     <= '0;
    b_in_valid <= '0;  
-   state    <= IDLE;
-   cnt_c      <= '0;
+   state      <= IDLE;
+   cnt_c      <= '0;  
   end
 else case (state)
       IDLE :        if(g_valid_i)
                       begin                     
                        k_b        <= n_data_i;                                       
-                       h_b_in     <= h_data_i;
-                       hm_xor     <= m_data_i ^ h_data_i;
+                       h_b_in     <= h_data_i;                       
                        b_in_valid <= '1;                  
                        state      <= WAIT_OUT_H;                                 
                       end
@@ -206,8 +205,11 @@ if(!rstn_i)
 else case(state_m)
        IDLE :          begin 
                         hash_data_valid_o <= '0;
-                        if(g_valid_i)                                                       
-                          h_a_in    <= m_data_i;                          
+                        if(g_valid_i) 
+                          begin                                                      
+                           h_a_in <= m_data_i;
+                           hm_xor <= m_data_i ^ h_data_i;
+                          end                           
                         if(k_valid)
                           begin
                            k_a        <= k_data[0];
