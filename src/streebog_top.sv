@@ -105,7 +105,7 @@ sc #(
 );
 
 logic mes_last_reg;
-enum {INIT, RECURSIVE, ADD_N_SUM, ADD_M_SUM, HASH_WAIT, WAIT_FSM_REQ } state;
+enum {INIT, RECURSIVE, ADD_N_SUM, ADD_M_SUM, HASH_WAIT, WAIT_FSM_REQ,ADD_EXTRA_M } state;
 enum {WAIT_VALID_HASM_AND_MES, LATCHED_M,LATCHED_H} state_1;
 always@(posedge clk_i or negedge rstn_i)
 if(!rstn_i)
@@ -155,6 +155,9 @@ INIT : begin
 		 	 if(mes_last_i)
 		 	   begin
                 nsum_in <= {502'h0,mes_last_len_i};
+				if(mes_last_len_i == N_FULL)
+				  state <= ADD_EXTRA_M;
+				else  
 		 	    state   <= ADD_N_SUM;
 		 	   end
 		 	 else
@@ -168,7 +171,7 @@ INIT : begin
 		 	 begin
 		 	  mes_ready_o   <= '1;	 
 		 	  g_valid       <= '0;  
-               nsum_in_valid <= '0;
+              nsum_in_valid <= '0;
 		 	  msum_in_valid <= '0;
 		 	 end		      
 	      end
@@ -186,7 +189,12 @@ RECURSIVE : case (state_1)
                                          if(hash_data_valid & mes_valid_i)
                                            begin
 			                            	if(mes_last_i)
-		 		                             state <= ADD_N_SUM;
+		 		                             begin
+								              if(mes_last_len_i == N_FULL)
+				                                state <= ADD_EXTRA_M;
+				                              else  
+		 	                                    state <= ADD_N_SUM;		 
+									         end  
 		 		                            else  				
 		 	                                 state <= RECURSIVE;			                            	                    
 			                                mes_ready_o <= '1;		      
@@ -243,7 +251,12 @@ RECURSIVE : case (state_1)
 								   g_valid       <= '1;
 								   state_1       <=  WAIT_VALID_HASM_AND_MES;								   							    								 								 
 								   if(mes_last_reg)
-		 		                    state <= ADD_N_SUM;
+								     begin
+								      if(mes_last_len_i == N_FULL)
+				                        state <= ADD_EXTRA_M;
+				                      else  
+		 	                            state <= ADD_N_SUM;		 
+									 end  
 		 		                   else  				
 		 	                        state <= RECURSIVE;				  
 							   	  end
@@ -266,7 +279,12 @@ RECURSIVE : case (state_1)
 			                   else
 			                    nsum_in      <= N_FULL;
 							   if(mes_last_i)
-		 		                 state <= ADD_N_SUM;
+		 		                 begin
+								  if(mes_last_len_i == N_FULL)
+				                    state <= ADD_EXTRA_M;
+				                  else  
+		 	                        state <= ADD_N_SUM;		 
+								 end  
 		 		                else  				
 		 	                     state <= RECURSIVE;                  	
 							  end 
@@ -276,6 +294,27 @@ RECURSIVE : case (state_1)
 
 	     default state_1 <= WAIT_VALID_HASM_AND_MES;  
           endcase
+
+ADD_EXTRA_M : if(hash_data_valid)
+               begin
+			    //			     
+			    g_valid       <= '1;				
+			    m_data        <= 512'd1;
+			    h_data        <= hash_data;
+				n_data        <= nsum_out;
+				msum_in_valid <= '1;
+				msum_in       <= 512'd1;
+				nsum_in_valid <= '1;
+				nsum_in       <= 512'd0;   
+			    // state switch                 
+				state <= ADD_N_SUM;							
+			   end
+			  else
+			    begin
+				 nsum_in_valid   <= '0;
+			     msum_in_valid   <= '0;
+				 g_valid         <= '0;
+				end	 	 
 
 ADD_N_SUM : begin	         
              nsum_in_valid   <= '0;
@@ -356,3 +395,4 @@ default state <= INIT;
 endcase
 
 endmodule
+
